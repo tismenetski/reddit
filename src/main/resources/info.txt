@@ -1,4 +1,5 @@
-LOMBOK
+##################LOMBOK##################
+#######@Data#######
 @Data is a convenient shortcut annotation that bundles the features of @ToString,
 @EqualsAndHashCode, @Getter / @Setter and @RequiredArgsConstructor together: In other words,
 @Data generates all the boilerplate that is normally associated with simple POJOs (Plain Old Java Objects) and beans:
@@ -8,8 +9,63 @@ and a constructor that initializes all final fields, as well as all non-final fi
 that have been marked with @NonNull, in order to ensure the field is never null.
 
 
-SECURITY
+######@Builder######
+The @Builder annotation produces complex builder APIs for your classes.
+
+@Builder lets you automatically produce the code required to have your class be instantiable with code such as:
+Person.builder().name("Adam Savage").city("San Francisco").job("Mythbusters").job("Unchained Reaction").build();
+
+@Builder can be placed on a class, or on a constructor, or on a method. While the "on a class" and "on a constructor" mode are the most common use-case, @Builder is most easily explained with the "method" use-case.
+
+A method annotated with @Builder (from now on called the target) causes the following 7 things to be generated:
+
+An inner static class named FooBuilder, with the same type arguments as the static method (called the builder).
+In the builder: One private non-static non-final field for each parameter of the target.
+In the builder: A package private no-args empty constructor.
+In the builder: A 'setter'-like method for each parameter of the target: It has the same type as that parameter and the same name. It returns the builder itself, so that the setter calls can be chained, as in the above example.
+In the builder: A build() method which calls the method, passing in each field. It returns the same type that the target returns.
+In the builder: A sensible toString() implementation.
+In the class containing the target: A builder() method, which creates a new instance of the builder.
+
+
+
+##################SECURITY##################
 * the authentication manager first checks for account locked, or expired before checking for bad credentials as
 it is reduces the number of calls for account checking if they already disabled or locked
 
 
+
+
+##################DTO##################
+
+What is a DTO?
+DTO, which stands for Data Transfer Object, is a design pattern conceived to reduce
+the number of calls when working with remote
+interfaces. As Martin Fowler defines in his blog,
+the main reason for using a Data Transfer Object is to batch
+up what would be multiple remote calls into a single one.
+
+For example, lets say that we were communicating with a RESTful API
+that exposes our banking account data. In this situation,
+instead of issuing multiple requests to check the current status and latest transactions of our account,
+the bank could expose an endpoint that returned a DTO summarizing everything.
+As one of the most expensive operations in remote applications is the
+round-trip time between the client and the server, this coarse-grained interface
+can help improving performance by a great deal.
+
+DTOs and Spring Boot APIs
+Another advantage of using DTOs on RESTful APIs written in Java (and on Spring Boot),
+is that they can help hiding implementation details of domain objects (aka. entities).
+Exposing entities through endpoints can become a security issue if we do not carefully handle
+what properties can be changed through what operations.
+
+As an example, let's imagine a Java API that exposes user details and accepts
+user updates through two endpoints. The first endpoint would handle GET requests and return user data,
+and the second endpoint would accept PUT requests to update these details.
+If this application didn't take advantage of DTOs, all the properties of the user
+would be exposed in the first endpoint (e.g. password) and the second endpoint would have to be
+very selective on what properties would accept when updating a user
+(e.g. not everybody can update the roles of a user).
+To overcome this situation, DTOs can come in handy by exposing only what the first endpoint is intended to expose,
+and by helping the second endpoint to restrict what it accepts.
+This characteristic helps us to keep the integrity of the data in our applications.
